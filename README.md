@@ -4,24 +4,33 @@
 
 1. При активации параметра `ALLURE_FOR_TESTRAIL_ENABLED` следует запускать тесты, добавляя в команду запуска
    тестов: `--alluredir=raw_reports`.
-2. Для автоматического выставления `Type: Automated`, `Automated Type: API/GUI` для тест-кейса в `TestRail`. Авто-тесты
-   для UI должны в пути проекта иметь папку с названием `UI` или `ui`, а для API `API` или `ui`. Информация в какой
+2. Для автоматического выставления `Type: Automated`, `Automated Type: API/GUI` для тест-кейса в `TestRail` авто-тесты
+   для UI должны в пути проекта иметь папку с названием `UI` или `ui`, а для API `API` или `ui`. Информация, в какой
    папке лежат тесты берётся из `allure` отчёта, поэтому, для автоматического выставления нужно запускать авто-тесты,
    добавляя `--alluredir=raw_reports`, а так же должны быть активны параметры `ALLURE_FOR_TESTRAIL_ENABLED`
    и `TESTRAIL_ENABLED`.
-3. Для автоматической генерации тест-кейса в `TestRail` нужно добавить сверху теста: `@TestRail.suite('Название_группы')`
+3. Для автоматической генерации тест-кейса в `TestRail` нужно добавить сверху
+   теста: `@TestRail.suite('Название_группы')`
    , где Название_группы - это группа из TestRail. При первом запуске сгенерируется тест-кейс с названием, описанием и
    шагами, а так же у авто-теста в коде автоматически проставится id тест-кейса в `TestRail`. При запуске авто-теста
-   нужно добавить команду `--alluredir=raw_reports`, а так же должны быть активны параметры `ALLURE_FOR_TESTRAIL_ENABLED` и `TESTRAIL_ENABLED`.
+   нужно добавить команду `--alluredir=raw_reports`, а так же должны быть активны
+   параметры `ALLURE_FOR_TESTRAIL_ENABLED` и `TESTRAIL_ENABLED`.
 
 ## Docker
+
 1. Docker можно запустить в файле `Dockerfile`.
 2. Если не запускается, в `cmd` запустить команду `wsl`, ввести свой пароль и запустить активацию докера. У вас будет
    свой путь, но пример команды: `sudo /etc/init.d/docker start`
 3. После внесения правок в коде тестов удалить старый `Image` во вкладке `Services` в PyCharm, если нужно произвести
    новый запуск в Docker.
 
-## Команды
+## GitLab CI
+
+1. Настроить CI для GitLab можно с помощью файла `.gitlab-ci.yml`.
+2. `flake8 .` - статический анализатор кода
+3. `unittests` - unit-тесты для проверки методов ядра фреймворка на базе Pytest
+
+# Команды
 
 Пример:
 
@@ -52,12 +61,12 @@ pytest --alluredir=raw_reports -n 16 --mode selenoid
 
 `flake8 .` - запуск статического анализатора кода
 
-
 # Описание параметров
 
 > [pytest.ini]
 
 Пример:
+
 ````
     environment=test
     ALLURE_DIR=raw_reports
@@ -138,7 +147,7 @@ pytest --alluredir=raw_reports -n 16 --mode selenoid
             "ENABLE_VNC": true,
             "ENABLE_VIDEO": false,
             "BROWSER_VERSION": "89.0",
-            "HUB": "http://example_selenoid:4444/wd/hub"
+            "HUB": "http://selenoid:4444/wd/hub"
         },
         "TIMEOUT": 60,
         "DB": {
@@ -301,22 +310,20 @@ class TestGoogle:
 
 `suite` - папка в сгенерированном отчёте `allure`
 
-`class TestAuth` - группировка тестов
+`class TestGoogle` - группировка тестов
 
 `@TestRail.suite('')` - название секции, в которой хранятся тест-кейсы. При отсутствии `@TestRail.id('')` при локальном
 запуске `id` автоматически добавится над авто-тестом, а так же в `TestRail` сгенерируется тест-кейс, указанный в `suite`
 
-`@title('Авторизация')` - наименование теста в сгенерированном отчёте `allure`
+`@title('')` - наименование теста в сгенерированном отчёте `allure`
 
-`@description('Проверка авторизации')` - описание действий теста в сгенерированном отчёте `allure`
+`@description('')` - описание действий теста в сгенерированном отчёте `allure`
 
 `@TestRail.id('')` - идентификатор тест-кейса в `TestRail`
 
-`def test_auth(self):` - название теста
+`def test_google_search(self):` - название теста
 
 #
-
-## Параметры в Core
 
 > [core/db/db.py]
 
@@ -530,13 +537,13 @@ class TestRail:
 
 #
 
-> [core/allure_wrapper.py]
+> [core/utils/allure_wrapper.py]
 
-`step` - аналог метода `step` из `allure`. Добавляет скриншоты на каждый шаг в `allure`
+`step` - аналог метода `step` из `allure`. Добавляет скриншоты на каждый шаг в `allure`. Использовать для UI авто-тестов
 
 #
 
-> [core/helpers.py]
+> [core/utils/helpers.py]
 
 ````
 def get_settings(environment):
@@ -550,10 +557,6 @@ def get_count_tests(reporter):
 
 def get_fixtures():
     ...
-
-@step('Проверка соответсвия приходящего JSON')
-def asserts(actual_data, asserts_data):
-    ...
 ````
 
 `get_settings` - метод для получения настроек из файла `config/config.json`
@@ -563,5 +566,14 @@ def asserts(actual_data, asserts_data):
 `get_count_tests` - метод для получения общего числа пройденных тестов
 
 `get_fixtures` - метод для получения файлов с фикстурами
+
+#
+
+> [core/utils/helpers.py]
+
+````
+@step('Проверка соответсвия приходящего JSON')
+def asserts(actual_data, asserts_data):
+````
 
 `asserts` - метод для проверки соответствия приходящего JSON

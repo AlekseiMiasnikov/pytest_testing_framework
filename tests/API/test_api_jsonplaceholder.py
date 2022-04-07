@@ -6,10 +6,10 @@ from helpers.utils import asserts
 
 
 @parent_suite('[Pytest][API]')
-@suite('JsonPlaceHolder')
+@suite('jsonplaceholder')
 class TestApiJsonPlaceHolder:
-    @TestRail.suite('API: JsonPlaceHolder')
-    @title('JsonPlaceHolder: Поиск')
+    @TestRail.suite('API: jsonplaceholder')
+    @title('jsonplaceholder: Поиск')
     @description('Поиск с ресурса jsonplaceholder. GET: /posts/1')
     @TestRail.id('TESTRAIL_ID')
     def test_api_jsonplaceholder_get(self, api_jsonplaceholder):

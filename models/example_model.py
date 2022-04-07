@@ -21,6 +21,7 @@ class ExampleModel(DB, BASE):
         super().__init__(session)
         self.id_example = data['id_example'] if data is not None else ''
         self.date_example = data['date_example'] if data is not None else ''
+        self.name_example = data['name_example'] if data is not None else ''
         self.guid_example = data['guid_example'] if data is not None else ''
 
     def get_example(self):

@@ -1,3 +1,4 @@
+# Example for GitLab CI Pytest: Flake8 and Docker -- Alexey Myasnikov
 cache:
   paths:
     - .cache/pip
@@ -11,3 +12,32 @@ static_analysis:
     - flake8 .
   tags:
     - docker
+
+# Example for GitLab CI Pytest Core: Flake8 and Unittests -- Alexey Myasnikov
+stages:
+  - flake
+  - unittests
+
+flake:
+  stage: flake
+  image: python:3.9
+  before_script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - python3 -m pip install -r requirements.txt
+  tags:
+    - ansible
+  script:
+    - flake8 .
+
+unittests:
+  stage: unittests
+  image: python:3.9
+  before_script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - python3 -m pip install -r requirements.txt
+  tags:
+    - ansible
+  script:
+    - python3 -m unittest discover -s pytest_core_kb/unittests -p '*_unittest.py'
