@@ -1,0 +1,13 @@
+cache:
+  paths:
+    - .cache/pip
+
+before_script:
+  - python3 -m pip install -r requirements.txt
+
+static_analysis:
+  stage: test
+  script:
+    - flake8 .
+  tags:
+    - docker
