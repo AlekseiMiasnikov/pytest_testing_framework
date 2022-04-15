@@ -1,23 +1,23 @@
 import os
 import re
 import shutil
-from math import ceil
-
-import pytest
-from os import getenv
 from glob import glob
+from math import ceil
+from os import getenv
 from os.path import join
 from pathlib import Path
+
+import pytest
 from selenium import webdriver
 from testrail_api import TestRailAPI
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 from webdriver_manager.chrome import ChromeDriverManager
-from selene.support.shared import config, browser as driver
 
-from core.utils.testrail import TestRail
 from core.utils.helpers import get_settings, get_count_tests, get_fixtures, formatted_time_for_testrail, \
     copy_files
+from core.utils.selene.support.shared import config, browser as driver
+from core.utils.testrail import TestRail
 
 mode = 'local'
 settings_config = {}
@@ -134,3 +134,15 @@ def browser(pytestconfig):
     config.base_url = settings_config['APPLICATION_URL']
     yield driver
     driver.quit()
+
+
+@pytest.fixture(scope='function')
+def mobile_application():
+    def wrapper(mobile_configuration):
+        mobile_driver = webdriver.Remote(
+            command_executor=settings_config['APPIUM']['HUB'],
+            desired_capabilities=mobile_configuration
+        )
+        mobile_driver.implicitly_wait(settings_config['TIMEOUT'])
+        return mobile_driver
+    return wrapper

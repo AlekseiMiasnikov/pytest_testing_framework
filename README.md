@@ -30,6 +30,13 @@
 2. `flake8 .` - статический анализатор кода
 3. `unittests` - unit-тесты для проверки методов ядра фреймворка на базе Pytest
 
+## Appium
+
+1. Пример для Android apk находятся в `files/apk/` ➔ переместить на локальный диск и указать это в `mobile_config` в
+   файле `utils`
+2. Должен быть включен эмулятор устройства в Android Studio и необходимый конфиг вписать в фикстуру в
+   папке `fixtures_ui`
+
 # Команды
 
 Пример:
@@ -54,8 +61,6 @@ pytest --alluredir=raw_reports -n 16 --mode selenoid
 `allure serve reports` - генерация отчета `allure`
 
 `pip install -r requirements.txt` - установка всех пакетов из файла `requirements.txt`, которые удалось определить
-
-`pip install -r requirements.txtpip install git+https://github.com/yashaka/selene.git` - установка пакета `selene`
 
 `pip freeze > requirements.txt` - сохранение установленных пакетов в файл `requirements.txt`
 
@@ -149,6 +154,9 @@ pytest --alluredir=raw_reports -n 16 --mode selenoid
             "BROWSER_VERSION": "89.0",
             "HUB": "http://selenoid:4444/wd/hub"
         },
+        "APPIUM": {
+            "HUB": "http://localhost:4723/wd/hub"
+        },
         "TIMEOUT": 60,
         "DB": {
             "DB_TYPE": "mysql",
@@ -181,6 +189,8 @@ pytest --alluredir=raw_reports -n 16 --mode selenoid
 `BROWSER_VERSION` - версия браузера в `selenoid`
 
 `HUB` - адрес `selenoid`, где будут выполнять тесты
+
+`APPIUM` - настройка `HUB` для `appium`
 
 `TIMEOUT` - время ожидания ответа от браузера или api
 

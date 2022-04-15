@@ -1,7 +1,13 @@
-from allure_commons.utils import func_parameters, represent
-from allure_commons._allure import StepContext, attach
 from functools import wraps
+from os import getenv
+from os.path import join
+from uuid import uuid4
+
+from allure_commons._allure import StepContext, attach
 from allure_commons.types import AttachmentType
+from allure_commons.utils import func_parameters, represent
+
+from core.utils.helpers import get_current_folder
 
 
 def step(title):
@@ -27,6 +33,14 @@ class CustomStepContext(StepContext):
                 try:
                     return func(*args, **kwargs)
                 finally:
-                    attach.file(source=args[0].browser.save_screenshot(), attachment_type=AttachmentType.PNG)
+                    try:
+                        attach.file(source=args[0].browser.save_screenshot(), attachment_type=AttachmentType.PNG)
+                    except BaseException:
+                        image_path = join(get_current_folder(getenv('ALLURE_DIR')), f'{uuid4()}.png')
+                        args[0].driver.get_screenshot_as_file(filename=image_path)
+                        attach.file(
+                            source=image_path,
+                            attachment_type=AttachmentType.PNG
+                        )
 
         return impl

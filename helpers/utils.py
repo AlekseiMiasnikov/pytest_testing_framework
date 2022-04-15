@@ -15,3 +15,15 @@ def asserts(actual_data: list, asserts_data: list):
                 assert actual_data[item][data] == asserts_data[item][data]
         else:
             assert actual_data[item] == asserts_data[item]
+
+
+@step('Использованная конфигурация: platformName="{platform}", platformVersion="{version}", deviceName="{device}", '
+      'automationName="{automation}, app="{app}"')
+def mobile_config(platform='Android', version='12.0', device='Pixel 5 API 31', automation='Appium', app='geekbench'):
+    return {
+        'platformName': platform,
+        'platformVersion': version,
+        'deviceName': device,
+        'automationName': automation,
+        'app': f'D:\\apk_{app}_example.apk'
+    }

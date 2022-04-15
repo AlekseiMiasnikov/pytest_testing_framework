@@ -5,7 +5,7 @@ from allure import title, description, suite, parent_suite
 from core.utils.testrail import TestRail
 
 
-@parent_suite('[Pytest][UI][MOBILE]')
+@parent_suite('[Pytest][MOBILE][UI]')
 @suite('Mobile')
 class TestMobile:
     @TestRail.suite('UI: Geekbench')

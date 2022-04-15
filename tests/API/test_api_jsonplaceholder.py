@@ -11,7 +11,7 @@ class TestApiJsonPlaceHolder:
     @TestRail.suite('API: jsonplaceholder')
     @title('jsonplaceholder: Поиск')
     @description('Поиск с ресурса jsonplaceholder. GET: /posts/1')
-    @TestRail.id('TESTRAIL_ID')
+    @TestRail.id('id_test_case')
     def test_api_jsonplaceholder_get(self, api_jsonplaceholder):
         asserts(
             actual_data=api_jsonplaceholder.jsonplaceholder_get(),
