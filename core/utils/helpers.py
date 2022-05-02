@@ -4,7 +4,6 @@ import shutil
 from os import getcwd
 from os.path import join
 from pathlib import Path
-from platform import system
 
 from pytest import PytestWarning
 
@@ -60,20 +59,13 @@ def get_current_folder(folder: str) -> str:
 
 
 def get_fixtures():
-    file_path = []
-    folder = []
-    for i in os.walk(get_current_folder(folder='fixtures')):
-        folder.append(i)
-    for address, _, files in folder:
+    files_list = []
+    for root, dirs, files in os.walk(get_current_folder(folder='fixtures')):
         for file in files:
-            if file.split('.')[-1] in ['pyc']:
-                continue
-            file = file.split('/') if system().lower() in ['linux', 'darwin'] else file.split('\\')
-            file = file[-1].split('.')[0]
-            if file not in ['__init__', '__pycache__'] and '__pycache__' not in address:
-                format_address = address.split('/')[-1] if system().lower() in ['linux', 'darwin'] \
-                    else address.split('\\')[-1]
-                file_path.append(f'{format_address}.{file}')
-    if len(file_path) == 0:
+            if '.pyc' not in file:
+                root_folder = root[root.find('fixtures'):].replace('\\', '.').replace('/', '.')
+                file_name = file[:len(file) - 3]
+                files_list.append(f'{root_folder}.{file_name}')
+    if len(files_list) == 0:
         raise PytestWarning('Не поддерживаемый запуск')
-    return file_path
+    return files_list
