@@ -1,6 +1,5 @@
 import pytest
-
-from web_pages import Google
+from pages_web import Google
 
 
 @pytest.fixture(scope='function')

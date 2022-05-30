@@ -1,1 +1,1 @@
-from web_pages.google import Google
+from pages_web.google import Google

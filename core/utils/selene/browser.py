@@ -61,7 +61,7 @@ def open(absolute_or_relative_url):
         'use `from selene.support.shared import browser` import',
         DeprecationWarning,
     )
-    return browser.open(absolute_or_relative_url)
+    return browser.open_page(absolute_or_relative_url)
 
 
 def open_url(absolute_or_relative_url):
@@ -70,7 +70,7 @@ def open_url(absolute_or_relative_url):
         'use `from selene.support.shared import browser` import',
         DeprecationWarning,
     )
-    return browser.open(absolute_or_relative_url)
+    return browser.open_page(absolute_or_relative_url)
 
 
 def element(css_or_xpath_or_by: Union[str, tuple]) -> Element:

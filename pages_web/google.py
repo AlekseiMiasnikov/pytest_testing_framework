@@ -7,7 +7,7 @@ class Google(Elements):
     def __init__(self, browser):
         self.browser = browser
 
-    @step('Открытие страницы')
+    @step('Открытие страницы браузера')
     def open(self, url='/'):
         self.browser.open(url)
 

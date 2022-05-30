@@ -1,7 +1,7 @@
 {
     "test": {
-        "APPLICATION_URL": "https://google.ru",
-        "API_URL": "https://jsonplaceholder.typicode.com",
+        "APPLICATION_URL": "https://google.com",
+        "API_URL": "https://api.google.com",
         "BROWSER_NAME": "chrome",
         "BROWSER_WINDOW_WIDTH": 1920,
         "BROWSER_WINDOW_HEIGHT": 1080,
@@ -11,42 +11,6 @@
             "BROWSER_VERSION": "89.0",
             "HUB": "http://selenoid:4444/wd/hub"
         },
-        "APPIUM": {
-            "HUB": "http://localhost:4723/wd/hub"
-        },
-        "TIMEOUT": 60,
-        "EXAMPLE_DB_POSTGRESQL": {
-            "USER": "root",
-            "PASSWORD": "",
-            "HOST": "126.0.0.1",
-            "PORT": "5432",
-            "DB_NAME": "postgresql",
-            "DB_TYPE": "postgresql"
-        },
-        "EXAMPLE_DB_MYSQL": {
-            "USER": "root",
-            "PASSWORD": "root",
-            "HOST": "126.0.0.1",
-            "DB_NAME": "mssql",
-            "DB_TYPE": "mysql"
-        },
-        "EXAMPLE_DB_ORACLE": {
-            "USER": "root",
-            "PASSWORD": "root",
-            "HOST": "126.0.0.1",
-            "PORT": "5432",
-            "DB_NAME": "mssql",
-            "DB_TYPE": "oracle"
-        },
-        "EXAMPLE_DB_MSSQL": {
-            "USER": "root",
-            "PASSWORD": "root",
-            "DB_NAME": "mssql",
-            "DB_TYPE": "mysql"
-        },
-        "EXAMPLE_DB_SQLITE": {
-            "PATH": "C:\\path\\to\\foo.db",
-            "DB_TYPE": "sqlite"
-        }
+        "TIMEOUT": 60
     }
 }
