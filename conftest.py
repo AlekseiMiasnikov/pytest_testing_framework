@@ -21,6 +21,7 @@ from core.utils.testrail import TestRail
 
 mode = 'local'
 settings_config = {}
+teamcity_launches = '1'
 testrail = TestRail()
 testrail_test_run = 0
 testrail_api = TestRailAPI(
@@ -34,11 +35,24 @@ temp_files = join(Path(__file__).parent, getenv("ALLURE_DIR"))
 pytest_plugins = get_fixtures()
 
 
-def pytest_sessionstart():
+def pytest_sessionstart(session):
+    global settings_config, testrail_api, testrail_test_run, teamcity_launches
+    marks = session.config.invocation_params.args
+    os.makedirs(temp_files, exist_ok=True)
+    if '--teamcity_launches' in marks:
+        path = f'{temp_files}/teamcity_launches.txt'
+        if not os.path.exists(os.path.dirname(path)):
+            try:
+                os.makedirs(os.path.dirname(path))
+            except BaseException:
+                pass
+        with open(path, 'w', encoding='utf-8') as file:
+            teamcity_launches = marks[marks.index('--teamcity_launches') + 1]
+            file.write(teamcity_launches)
     disable_warnings(InsecureRequestWarning)
-    global settings_config, testrail_api, testrail_test_run
     settings_config = get_settings(environment=getenv('environment'))
-    if int(getenv('TESTRAIL_ENABLED')) == 1 and int(getenv("ALLURE_FOR_TESTRAIL_ENABLED")) == 0:
+    if int(getenv('TESTRAIL_ENABLED')) == 1 and int(getenv("ALLURE_FOR_TESTRAIL_ENABLED")) == 0 \
+            and teamcity_launches == getenv('TEAMCITY_LAUNCHES'):
         testrail_test_run = testrail.create_test_run(tr=testrail_api)
     if not os.path.exists(temp_files):
         os.mkdir(temp_files)
@@ -47,10 +61,21 @@ def pytest_sessionstart():
 def pytest_sessionfinish(session):
     reporter = session.config.pluginmanager.get_plugin('terminalreporter')
     is_full_tests_collections = session.testscollected == get_count_tests(reporter)
-    if is_full_tests_collections and int(getenv('TESTRAIL_ENABLED')) == 1:
+    if is_full_tests_collections and int(getenv('TESTRAIL_ENABLED')) == 1 \
+            and teamcity_launches == getenv('TEAMCITY_LAUNCHES'):
         if int(getenv('ALLURE_FOR_TESTRAIL_ENABLED')) == 1:
-            testrail.set_statuses(tr=testrail_api, data={'test_run_id': testrail_test_run})
-            copy_files(source_folder=temp_files, destination_folder=join(Path(__file__).parent, 'reports'))
+            testrail.set_statuses(
+                tr=testrail_api,
+                data={
+                    'test_run_id': testrail_test_run,
+                    'teamcity_launches': teamcity_launches,
+                    'run_mode': mode
+                }
+            )
+            try:
+                copy_files(source_folder=temp_files, destination_folder=join(Path(__file__).parent, 'reports'))
+            except BaseException:
+                pass
             shutil.rmtree(temp_files, ignore_errors=True)
         if int(getenv('TESTRAIL_AUTOCLOSE_TESTRUN')) == 1 and testrail_test_run:
             testrail.close_test_run(tr=testrail_api, run_id=testrail_test_run)
@@ -64,8 +89,6 @@ def pytest_sessionfinish(session):
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    with open(f'{temp_files}/mode.txt', 'w') as file:
-        file.write(mode)
     result = yield
     report = result.get_result()
     if int(getenv('TESTRAIL_ENABLED')) == 0 or int(getenv("ALLURE_FOR_TESTRAIL_ENABLED")) == 1 or call.when != 'call' \
@@ -94,6 +117,7 @@ def pytest_runtest_makereport(item, call):
 
 def pytest_addoption(parser):
     parser.addoption('--mode', action='store', default='local')
+    parser.addoption('--teamcity_launches', action='store', default='1')
 
 
 @pytest.fixture(scope='function')

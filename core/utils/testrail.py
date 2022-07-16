@@ -388,8 +388,12 @@ class TestRail:
         for field in custom_result_fields.keys():
             if field == 'custom_browser' and custom_browser is not None:
                 custom_result_fields[field] = custom_browser
-        if int(getenv("ALLURE_FOR_TESTRAIL_ENABLED")) == 1 and len(raw_data['testrail_ids']) > 0:
+        if int(getenv("ALLURE_FOR_TESTRAIL_ENABLED")) == 1 and len(raw_data['testrail_ids']) > 0 \
+                and data['teamcity_launches'] == getenv('TEAMCITY_LAUNCHES'):
             data['test_run_id'] = self.create_test_run(tr=tr, testrail_ids=raw_data['testrail_ids'])
+        data['run_mode'] = data.get('run_mode', 'local')
+        data['teamcity_launches'] = data.get('teamcity_launches', getenv('TEAMCITY_LAUNCHES') if getenv(
+            'TEAMCITY_LAUNCHES') is not None else '1')
         for value in raw_data['results']:
             result = {
                 'case_id': None,
@@ -460,13 +464,13 @@ class TestRail:
             for key, val in enumerate(result['steps']):
                 if val['status'] == 'passed':
                     continue
+                # if len(result['steps']) != key + 1:
+                #     continue
                 if val['image']['img'] is None:
                     continue
                 result['steps'][key]['image']['name'] = val["image"]["img"]
                 result['upload_files'].append(
                     self._get_path({'is_tests': True, 'nested_path': f'{getenv("ALLURE_DIR")}/{val["image"]["img"]}'}))
-            with open(self._get_path({'is_nested_path': True, 'nested_path': 'mode.txt'}), 'r') as file:
-                mode = file.read()
             case_status_id_current = int(self._get_status(tr, int(result['case_id']), int(data['test_run_id'])))
             status_id = getenv('TESTRAIL_PASSED_STATUS')
             if case_status_id_current == int(getenv('TESTRAIL_FAILED_STATUS')) or result['case_status'] == 'failed':
@@ -478,7 +482,7 @@ class TestRail:
                 case_id=int(result['case_id']),
                 status_id=status_id,
                 elapsed=result['case_time'],
-                comment=self._get_comment(result, mode),
+                comment=self._get_comment(result, data['run_mode']),
                 **custom_result_fields
             )
             for file in result['upload_files']:
@@ -487,5 +491,6 @@ class TestRail:
             if 'fullName' in value.keys():
                 automated_type = self._get_test_type(value=value['fullName'])
                 self.set_automation_status(tr=tr, case_id=result['case_id'], automated_type=automated_type)
-        if int(getenv('TESTRAIL_AUTOCLOSE_TESTRUN')) == 1 and len(raw_data['testrail_ids']) > 0:
+        if int(getenv('TESTRAIL_AUTOCLOSE_TESTRUN')) == 1 and len(raw_data['testrail_ids']) > 0 \
+                and data['teamcity_launches'] == getenv('TEAMCITY_LAUNCHES'):
             self.close_test_run(tr=tr, run_id=data['test_run_id'])
